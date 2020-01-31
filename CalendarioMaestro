@@ -1,0 +1,27 @@
+// ------------------------------------------------------------------------------------------------------------
+// Generación del calendario maestro
+// ------------------------------------------------------------------------------------------------------------
+[Calendario Maestro]:
+LOAD date_tmp				 					AS %IdFecha,
+	DATE(date_tmp) 								AS [Transaction Date],
+	YEAR(date_tmp)								AS Year,
+	'Q' & CEIL(MONTH(date_tmp) / 3)			  	AS Quarter,	
+	MONTH(date_tmp)								AS Month,
+	WEEK(date_tmp)								AS Week,
+	DAY(date_tmp) 								AS Day,	//O con acento
+	WEEKDAY(date_tmp) 							AS DiaDeSemana, //Label: Día
+	MONTH(date_tmp) & ' - ' & DAY(date_tmp) 	AS [Mes-Dia],	
+	DUAL(MONTH(date_tmp) & ' ´' & RIGHT(YEAR(date_tmp),2)  ,  YEAR(date_tmp)&IF(NUM(MONTH(date_tmp))<10,'0' & NUM(MONTH(date_tmp)), NUM(MONTH(date_tmp)))	)			AS MesNom,  //A.K.A. AñoMes
+	DUAL('Q' & CEIL(MONTH(date_tmp) / 3) & ' ´' & RIGHT(YEAR(date_tmp),2),YEAR(date_tmp)&'.'&CEIL(MONTH(date_tmp) / 3)   )												AS TrimestreNom,
+	APPLYMAP('Map_ExchangeRate',date_tmp,0)		AS	[Exchange Rate];
+
+
+//------- Generamos una tabla con las fechas
+LOAD DATE(minDate_tmp + ITERNO()) 							AS date_tmp
+WHILE minDate_tmp + ITERNO() <= maxDate_tmp;
+
+//------- Obtenemos el min/max del campo %Noches.Fecha
+LOAD
+ MIN(FIELDVALUE('%IdFecha', RECNO()))-1 	AS minDate_tmp,
+ MAX(FIELDVALUE('%IdFecha', RECNO())) 		AS maxDate_tmp
+AUTOGENERATE FIELDVALUECOUNT('%IdFecha');
