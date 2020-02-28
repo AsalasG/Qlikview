@@ -1,0 +1,5 @@
+LET numTables = NoOfTables();
+FOR i=1 to $(numTables)
+  LET tt = TableName(0);
+  DROP table [$(tt)];
+NEXT
